@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.cisc181.exceptions.PersonException;
+
 /*
  * comment
  */
@@ -42,14 +44,22 @@ public abstract class Person implements java.io.Serializable {
 		this.LastName = LastName;
 	}
 
-	public Date getDOB() {
-		return DOB;
+	public Date getDOB() throws PersonException{
+		Calendar today = Calendar.getInstance();
+		Calendar birthDate = Calendar.getInstance();
+		birthDate.setTime(this.DOB);
+
+		if ((today.get(Calendar.YEAR) - birthDate.get(Calendar.YEAR)) > 100) {
+			throw new PersonException(DOB);
+		}
+		else {
+			return DOB;
+		}
 	}
 
-	public void setDOB(Date DOB){
+	public void setDOB(Date DOB) {
 		this.DOB = DOB;
-		
-		
+
 	}
 
 	public void setAddress(String newAddress) {
@@ -62,11 +72,25 @@ public abstract class Person implements java.io.Serializable {
 
 	public void setPhone(String newPhone_number) {
 		phone_number = newPhone_number;
-	
+
 	}
 
-	public String getPhone() {
-		return phone_number;
+	public String getPhone() throws PersonException {
+		
+
+		String number = this.getPhone();
+		String regex = "^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(number);
+		if (matcher.matches()) {
+			System.out.println("true");
+			return phone_number;
+		}
+		else {
+			System.out.println("false");
+			throw new PersonException(phone_number);
+		}
+
 	}
 
 	public void setEmail(String newEmail) {
@@ -88,9 +112,8 @@ public abstract class Person implements java.io.Serializable {
 	 * Constructors Constructor with arguments
 	 */
 
-	public Person(String FirstName, String MiddleName, String LastName,
-			Date DOB, String Address, String Phone_number, String Email)
-	{
+	public Person(String FirstName, String MiddleName, String LastName, Date DOB, String Address, String Phone_number,
+			String Email) {
 		this.FirstName = FirstName;
 		this.MiddleName = MiddleName;
 		this.LastName = LastName;
@@ -98,19 +121,18 @@ public abstract class Person implements java.io.Serializable {
 		this.address = Address;
 		this.setPhone(Phone_number);
 		this.email_address = Email;
-		
+
 	}
 
 	public void PrintName() {
-		System.out.println(this.FirstName + ' ' + this.MiddleName + ' '
-				+ this.LastName);
+		System.out.println(this.FirstName + ' ' + this.MiddleName + ' ' + this.LastName);
 	}
 
 	public void PrintDOB() {
 		System.out.println(this.DOB);
 	}
 
-	public int PrintAge() {
+	public int PrintAge() throws PersonException {
 		Calendar today = Calendar.getInstance();
 		Calendar birthDate = Calendar.getInstance();
 
@@ -119,26 +141,48 @@ public abstract class Person implements java.io.Serializable {
 		if (birthDate.after(today)) {
 			throw new IllegalArgumentException("Can't be born in the future");
 		}
+
 		age = today.get(Calendar.YEAR) - birthDate.get(Calendar.YEAR);
 
 		// If birth date is greater than todays date (after 2 days adjustment of
 		// leap year) then decrement age one year
-		if ((birthDate.get(Calendar.DAY_OF_YEAR)
-				- today.get(Calendar.DAY_OF_YEAR) > 3)
+		if ((birthDate.get(Calendar.DAY_OF_YEAR) - today.get(Calendar.DAY_OF_YEAR) > 3)
 				|| (birthDate.get(Calendar.MONTH) > today.get(Calendar.MONTH))) {
 			age--;
 
 			// If birth date and todays date are of same month and birth day of
 			// month is greater than todays day of month then decrement age
 		} else if ((birthDate.get(Calendar.MONTH) == today.get(Calendar.MONTH))
-				&& (birthDate.get(Calendar.DAY_OF_MONTH) > today
-						.get(Calendar.DAY_OF_MONTH))) {
+				&& (birthDate.get(Calendar.DAY_OF_MONTH) > today.get(Calendar.DAY_OF_MONTH))) {
 			age--;
 		}
 
-		System.out.println("age is " + age);
+			System.out.println("age is " + age);
 
-		return age;
+			return age;
+		}
 
 	}
+
+
+/*char char1 = getPhone().charAt(0);
+char char2 = getPhone().charAt(1);
+char char3 = getPhone().charAt(2);
+char char4 = getPhone().charAt(3);
+char char5 = getPhone().charAt(4);
+char char6 = getPhone().charAt(5);
+char char7 = getPhone().charAt(6);
+char char8 = getPhone().charAt(7);
+char char9 = getPhone().charAt(8);
+char char10 = getPhone().charAt(9);
+char char11 = getPhone().charAt(10);
+char char12 = getPhone().charAt(11);
+char char13 = getPhone().charAt(12);
+char char14 = getPhone().charAt(13);
+
+if (char char1 != "(" || char char4 != ")" || char char5 != "-" || char char9 != "-") {
+	throw new PersonException(phone_number);
 }
+else {
+	return phone_number;
+}*/
